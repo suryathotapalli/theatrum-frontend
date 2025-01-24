@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>THEATRUM - Payment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center top;
+            color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            padding: 2em;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 1em;
+        }
+
+        .summary {
+            text-align: left;
+            color: #e0e0e0;
+            margin-bottom: 1.5em;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75em;
+            margin: 0.5em 0;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 5px;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: auto;
+            margin-top: 0.5em;
+        }
+
+        .pay-btn {
+            display: block;
+            width: 100%;
+            padding: 1em;
+            margin-top: 1em;
+            background-color: transparent;
+            color: white;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        .pay-btn:hover {
+            background-color: white;
+            color: black;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h2>Complete Your Payment</h2>
+
+        <!-- Payment Summary Section -->
+        <div class="summary">
+            <p><strong>Selected Plan:</strong> <span id="selectedPlan">Loading...</span></p>
+            <p><strong>Price:</strong> ₹<span id="planPrice">Loading...</span>/month</p>
+        </div>
+
+        <!-- Payment Form -->
+        <form id="paymentForm">
+            <input type="text" class="input-field" placeholder="Cardholder's Name" required>
+            <input type="text" class="input-field" id="cardNumber" placeholder="Card Number" required>
+            <img id="cardIcon" class="card-icon" src="" alt="Card Type" style="display:none;">
+            <input type="text" class="input-field" placeholder="MM/YY" required>
+            <input type="text" class="input-field" id="cvv" placeholder="CVV" required>
+            <button type="submit" class="pay-btn">Pay Now</button>
+        </form>
+    </div>
+
+    <script>
+        function getUrlParams() {
+            const params = {};
+            window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (str, key, value) {
+                params[key] = decodeURIComponent(value);
+            });
+            return params;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = getUrlParams();
+
+            const signupData = JSON.parse(localStorage.getItem('signupData'));
+            if (!signupData) {
+                alert('Signup data is missing. Redirecting to sign-up page.');
+                window.location.href = 'sign-up.html';
+                return;
+            }
+
+            if (!params.plan || !params.price) {
+                alert('Missing payment details. Redirecting to plan selection.');
+                window.location.href = 'plan-selection.html';
+                return;
+            }
+
+            document.getElementById("selectedPlan").textContent = params.plan;
+            document.getElementById("planPrice").textContent = params.price;
+            localStorage.setItem('paymentMethod', 'Card');
+        });
+
+        document.getElementById('cardNumber').addEventListener('keyup', function () {
+            const cardNumber = this.value.trim();
+            const cardIcon = document.getElementById('cardIcon');
+
+            if (/^4/.test(cardNumber)) {
+                cardIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/5/53/Visa_2014.svg';
+                cardIcon.alt = 'Visa';
+                cardIcon.style.display = 'block';
+            } else if (/^5[1-5]/.test(cardNumber)) {
+                cardIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg';
+                cardIcon.alt = 'MasterCard';
+                cardIcon.style.display = 'block';
+            } else if (/^3[47]/.test(cardNumber)) {
+                cardIcon.src = 'https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg';
+                cardIcon.alt = 'American Express';
+                cardIcon.style.display = 'block';
+            } else {
+                cardIcon.style.display = 'none';
+            }
+
+            cardIcon.onerror = () => {
+                cardIcon.style.display = 'none';
+            };
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const cardNumber = document.getElementById('cardNumber').value.trim();
+            const cardNumberRegex = /^\d{16}$/;
+            if (!cardNumberRegex.test(cardNumber)) {
+                alert('Please enter a valid 16-digit card number.');
+                return;
+            }
+
+            const cvv = document.getElementById('cvv').value.trim();
+            const cvvRegex = /^\d{3}$/;
+            if (!cvvRegex.test(cvv)) {
+                alert('Please enter a valid 3-digit CVV.');
+                return;
+            }
+
+            const signupData = JSON.parse(localStorage.getItem('signupData'));
+            const selectedPlan = JSON.parse(localStorage.getItem('selectedPlan'));
+            const paymentMethod = localStorage.getItem('paymentMethod');
+
+            if (!signupData || !selectedPlan || !paymentMethod) {
+                alert('Missing signup, plan, or payment method details. Please restart the process.');
+                window.location.href = 'sign-up.html';
+                return;
+            }
+
+            const paymentDetails = {
+                name: signupData.username,
+                email: signupData.email,
+                password: signupData.password,
+                plan: selectedPlan.name,
+                paymentMethod: paymentMethod,
+                paymentStatus: 'Paid',
+            };
+
+            fetch('http://localhost:5000/api/auth/save-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentDetails),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        return response.json().then((err) => {
+                            throw new Error(err.message || 'Failed to save user');
+                        });
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    alert('Payment successful! Redirecting to success page.');
+                    localStorage.clear();
+                    window.location.href = 'success.html';
+                })
+                .catch((error) => {
+                    alert('An error occurred during payment. Please try again.');
+                });
+        });
+    </script>
+</body>
+</html>

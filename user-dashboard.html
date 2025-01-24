@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THEATRUM - User Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* THEATRUM Logo */
+        .logo-container img {
+            height: 60px;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        /* Floating Navigation Elements */
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        /* Dropdown Menu Styling */
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu .item {
+            position: relative;
+        }
+
+        .menu .link {
+            font-size: 16px;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 16px;
+            background-color: teal;
+            overflow: hidden;
+            transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+        }
+
+        .menu .link::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #005f5f;
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .menu .link:hover::after {
+            transform: scaleX(1);
+            transform-origin: right;
+        }
+
+        .menu .item:hover .link {
+            color: white;
+        }
+
+        .menu .item .submenu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #111;
+            border: 1px solid teal;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-12px);
+            transition: all 0.48s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 0 0 16px 16px;
+            overflow: hidden;
+        }
+
+        .menu .item:hover .submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .submenu .submenu-link {
+            padding: 10px 20px;
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        .submenu .submenu-link:hover {
+            background-color: teal;
+            color: white;
+        }
+
+        /* Favourites Button */
+        .favourites {
+            --i: #00bf63;
+            --j: #005f5f;
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 60px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: 0.5s;
+        }
+
+        .favourites:hover {
+            width: 180px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0);
+        }
+
+        .favourites::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 60px;
+            background: linear-gradient(45deg, var(--i), var(--j));
+            opacity: 0;
+            transition: 0.5s;
+        }
+
+        .favourites:hover::before {
+            opacity: 1;
+        }
+
+        .favourites::after {
+            content: "";
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            height: 100%;
+            border-radius: 60px;
+            background: linear-gradient(45deg, var(--i), var(--j));
+            transition: 0.5s;
+            filter: blur(15px);
+            z-index: -1;
+            opacity: 0;
+        }
+
+        .favourites:hover::after {
+            opacity: 0.5;
+        }
+
+        .favourites .icon {
+            color: #777;
+            font-size: 1.75em;
+            transition: 0.5s;
+            transition-delay: 0.25s;
+        }
+
+        .favourites:hover .icon {
+            transform: scale(0);
+            color: #fff;
+            transition-delay: 0s;
+        }
+
+        .favourites .title {
+            position: absolute;
+            color: #fff;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transform: scale(0);
+            transition: 0.5s;
+            transition-delay: 0s;
+        }
+
+        .favourites:hover .title {
+            transform: scale(1);
+            transition-delay: 0.25s;
+        }
+
+        /* Profile Icon (Smaller) */
+        .button-container {
+            display: flex;
+            background-color: rgba(0, 128, 128);
+            width: 60px;
+            height: 60px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px,
+                rgba(0, 128, 128, 0.5) 5px 10px 15px;
+            transition: all 0.5s;
+        }
+
+        .button-container:hover {
+            width: 70px;
+            height: 70px;
+            transition: all 0.5s;
+        }
+
+        .button {
+            outline: 0 !important;
+            border: 0 !important;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        /* Carousel Styling */
+        .carousel {
+            height: 85vh;
+        }
+
+        .carousel-item video {
+            width: 100%;
+            height: 85vh;
+            object-fit: cover;
+        }
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 20%;
+            left: 5%;
+            text-align: left;
+        }
+
+        .carousel-caption h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+
+        .play-button {
+            padding: 0.7em 1.5em;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            background-color: #008080;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .play-button:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 128, 128, 0.5);
+        }
+
+        .mute-icon {
+            position: absolute;
+            bottom: 1em;
+            right: 1em;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .mute-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Horizontal Scroll Sections */
+        .scroll-section {
+            margin: 30px 0;
+        }
+
+        .scroll-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .scroll-container {
+            display: flex;
+            gap: 1em;
+            overflow-x: auto;
+            padding-bottom: 1em;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .thumbnail {
+            flex: 0 0 auto;
+            width: 300px;
+            height: 170px;
+            background-color: #222;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .thumbnail:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-button-hover {
+            padding: 0.5em 1.5em;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            background-color: #008080;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .play-button-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 128, 128, 0.5);
+        }
+
+
+        .scroll-section {
+    margin: 30px 0;
+}
+
+.scroll-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.scroll-container {
+    display: flex;
+    gap: 1em;
+    overflow-x: auto;
+    padding-bottom: 1em;
+}
+
+.scroll-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: teal;
+    border-radius: 4px;
+}
+
+.thumbnail {
+    flex: 0 0 auto;
+    width: 300px;
+    height: 170px;
+    background-color: #222;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.thumbnail:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.movie-number {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 128, 128, 0.9);
+    color: white;
+    font-weight: bold;
+    font-size: 1.5em;
+    padding: 0.2em 0.5em;
+    border-radius: 5px;
+}
+
+
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.thumbnail:hover .play-overlay {
+    opacity: 1;
+}
+
+.play-button-hover {
+    padding: 0.5em 1.5em;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    background-color: teal;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.play-button-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0, 128, 128, 0.5);
+}
+.heart-container {
+  --heart-color: rgb(255, 91, 137);
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 50px;
+  height: 50px;
+  transition: 0.3s;
+  z-index: 10; /* Ensure it's above the thumbnail */
+}
+
+.heart-container .checkbox {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 20;
+  cursor: pointer;
+}
+
+.heart-container .svg-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heart-container .svg-outline,
+.heart-container .svg-filled {
+  fill: var(--heart-color);
+  position: absolute;
+}
+
+.heart-container .svg-filled {
+  animation: keyframes-svg-filled 1s;
+  display: none;
+}
+
+.heart-container .svg-celebrate {
+  position: absolute;
+  animation: keyframes-svg-celebrate 0.5s;
+  animation-fill-mode: forwards;
+  display: none;
+  stroke: var(--heart-color);
+  fill: var(--heart-color);
+  stroke-width: 2px;
+}
+
+.heart-container .checkbox:checked ~ .svg-container .svg-filled {
+  display: block;
+}
+
+.heart-container .checkbox:checked ~ .svg-container .svg-celebrate {
+  display: block;
+}
+
+@keyframes keyframes-svg-filled {
+  0% {
+    transform: scale(0);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
+}
+
+@keyframes keyframes-svg-celebrate {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+    display: none;
+  }
+}
+
+.thumbnail {
+    position: relative; /* Ensure child elements like the heart are positioned correctly */
+}
+.movie-number {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem; /* Adjust font size as needed */
+    padding: 5px 10px;
+    border-radius: 50%; /* Optional: For circular numbering */
+    z-index: 5;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background: #1e1e2f;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: right 0.3s ease;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: #008080;
+    color: white;
+    text-align: center;
+}
+
+.sidebar-content {
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar-content button {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(90deg, #ff70a1, #00d9d9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.sidebar-content button:hover {
+    background: linear-gradient(90deg, #e7638d, #00a3a3);
+    transform: scale(1.05);
+}
+
+/* Profile Button Styles */
+#profileButton {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+    cursor: pointer;
+}
+
+/* Open Sidebar Class */
+.sidebar.open {
+    right: 0;
+}
+
+
+    </style>
+</head>
+<body>
+    <div id="userSidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3 id="usernameDisplay">Hello, User</h3>
+        </div>
+        <div class="sidebar-content">
+            <button class="btn btn-primary" id="chatbotButton">Open Chatbot</button>
+            <button class="btn btn-danger" id="signOutButton">Sign Out</button>
+        </div>
+    </div>
+    
+    <!-- Floating Profile Icon -->
+    <div class="button-container" id="profileButton">
+        <button class="button">
+            <svg class="icon" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2.5a5.5 5.5 0 0 1 3.096 10.047 9.005 9.005 0 0 1 5.9 8.181.75.75 0 1 1-1.499.044 7.5 7.5 0 0 0-14.993 0 .75.75 0 0 1-1.5-.045 9.005 9.005 0 0 1 5.9-8.18A5.5 5.5 0 0 1 12 2.5ZM8 8a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Floating THEATRUM Logo -->
+    <div class="logo-container">
+        <img src="https://i.ibb.co/Fqxsvg3/Screenshot-2024-11-23-153633-removebg-preview.png" alt="THEATRUM Logo">
+    </div>
+
+    <!-- Floating Navigation -->
+    <div class="navigation">
+        <div class="menu">
+            <div class="item">
+                <a href="#" class="link">Languages</a>
+                <div class="submenu">
+                    <a href="English.html" class="submenu-link">English</a>
+                    <a href="Hindi.html" class="submenu-link">Hindi</a>
+                    <a href="Tamil.html" class="submenu-link">Tamil</a>
+                    <a href="Malayalam.html" class="submenu-link">Malayalam</a>
+                    <a href="Telugu.html" class="submenu-link">Telugu</a>
+                </div>
+            </div>
+            <div class="item">
+                <a href="#" class="link">Genre</a>
+                <div class="submenu">
+                    <a href="Action.html" class="submenu-link">Action</a>
+                    <a href="Comedy.html" class="submenu-link">Comedy</a>
+                    <a href="Drama.html" class="submenu-link">Drama</a>
+                    <a href="Sci-Fi.html" class="submenu-link">Sci-Fi</a>
+                    <a href="Thriller.html" class="submenu-link">Thriller</a>
+                </div>
+            </div>
+        </div>
+        <div class="favourites" onclick="window.location.href='feedback.html'">
+            <span class="icon" >💚</span>
+            <span class="title">FEEDBACK</span>
+        </div>
+        <div class="button-container">
+            <button class="button">
+                <svg class="icon" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2.5a5.5 5.5 0 0 1 3.096 10.047 9.005 9.005 0 0 1 5.9 8.181.75.75 0 1 1-1.499.044 7.5 7.5 0 0 0-14.993 0 .75.75 0 0 1-1.5-.045 9.005 9.005 0 0 1 5.9-8.18A5.5 5.5 0 0 1 12 2.5ZM8 8a4 4 0 1 0 8 0 4 4 0 0 0-8 0Z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Autoplay Carousel -->
+    <div id="autoplayCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Video 1 -->
+            <div class="carousel-item active">
+                <video 
+                    class="d-block w-100" 
+                    src="http://localhost:5000/uploads/videos/Drama_Oppenheimer_English.mp4" 
+                    autoplay 
+                    loop 
+                    muted 
+                    playsinline>
+                </video>
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Oppenheimer</h5>
+                    <p>Action - English</p>
+                </div>
+            </div>
+            <!-- Video 2 -->
+            <div class="carousel-item">
+                <video 
+                    class="d-block w-100" 
+                    src="http://localhost:5000/uploads/videos/Drama_SooraraiPottru_Tamil.mp4" 
+                    autoplay 
+                    loop 
+                    muted 
+                    playsinline>
+                </video>
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Sooraraipottru</h5>
+                    <p>Drama - Tamil</p>
+                </div>
+            </div>
+            <!-- Video 3 -->
+            <div class="carousel-item">
+                 <video
+                    class="d-block w-100" 
+                    src="http://localhost:5000/uploads/videos/Drama_Oopiri_Telugu.mp4" 
+                    autoplay 
+                    loop 
+                    muted 
+                    playsinline>
+                </video>
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Oopiri</h5>
+                    <p>Drama - Telugu</p>
+                </div>
+            </div>
+        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#autoplayCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#autoplayCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+        <!-- Mute/Unmute Icon -->
+        <div class="mute-icon" id="muteIcon">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/mute--v1.png" alt="Mute">
+        </div>
+    </div>
+    
+
+    <!-- Horizontal Scroll Sections -->
+    <div class="content">
+             <div class="scroll-section">
+                <h2>Trending Now</h2>
+                <div class="scroll-container">
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_Adhurs_Telugu.mp4">
+                        <!-- Add numbering here -->
+                        <div class="movie-number">1</div>
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_Adhurs_Telugu.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_SpeakNoEvil_English.mp4">
+                        <!-- Add numbering here -->
+                        <div class="movie-number">2</div>
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_SpeakNoEvil_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_Charlie_Malayalam.mp4">
+                        <!-- Add numbering here -->
+                        <div class="movie-number">3</div>
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_Charlie_Malayalam.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_Mahanati_Telugu.mp4">
+                        <!-- Add numbering here -->
+                        <div class="movie-number">4</div>
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_Mahanati_Telugu.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_ReadyPlayerOne_English.mp4">
+                        <!-- Add numbering here -->
+                        <div class="movie-number">5</div>
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_ReadyPlayerOne_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Add your movies manually here -->
+                </div>
+            </div>
+            <!-- New on THEATRUM Section -->
+            <div class="scroll-section">
+                <h2>New on THEATRUM</h2>
+                <div class="scroll-container">
+                    <!-- Example movie, replace or add your movies -->
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Action_EndGame_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Action_EndGame_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_Aavesham_Malayalam.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_Aavesham_Malayalam.jpg" alt="Aavesham">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_96_Tamil.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_96_Tamil.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_Dune1_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_Dune1_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_LoveToday_Tamil.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_LoveToday_Tamil.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Family Favorites Section -->
+            <div class="scroll-section">
+                <h2>Family Favorites</h2>
+                <div class="scroll-container">
+                    <!-- Add your movies manually here -->
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_MathuVadalara2_Telugu.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_MathuVadalara2_Telugu.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_Aavesham_Malayalam.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_Aavesham_Malayalam.jpg" alt="Aavesham">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_Athadu_Telugu.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_Athadu_Telugu.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_MrBeanHoliday_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_MrBeanHoliday_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Comedy_BhoolBhulaiyaa_Hindi.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Comedy_BhoolBhulaiyaa_Hindi.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Award-Winning Dramas Section -->
+            <div class="scroll-section">
+                <h2>Award-Winning Dramas</h2>
+                <div class="scroll-container">
+                    <!-- Add your movies manually here -->
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_ThondimuthalumDriksakshiyum_Malayalam.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_ThondimuthalumDriksakshiyum_Malayalam.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_TheFallGuy_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_TheFallGuy_English.jpg" alt="Aavesham">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_VadaChennai_Tamil.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_VadaChennai_Tamil.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_Oopiri_Telugu.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_Oopiri_Telugu.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Drama_22FemaleKottayam_Malayalam.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Drama_22FemaleKottayam_Malayalam.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Science Fiction Wonders Section -->
+            <div class="scroll-section">
+                <h2>Science Fiction Wonders</h2>
+                <div class="scroll-container">
+                    <!-- Add your movies manually here -->
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_Martian_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_Martian_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_DoBaaraa_Hindi.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_DoBaaraa_Hindi.jpg" alt="Aavesham">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_Gaganachari_Malayalam.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_Gaganachari_Malayalam.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_Dune1_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_Dune1_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/ScienceFiction_Dune2_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/ScienceFiction_Dune2_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Thrilling Adventures Section -->
+            <div class="scroll-section">
+                <h2>Thrilling Adventures</h2>
+                <div class="scroll-container">
+                    <!-- Add your movies manually here -->
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Thriller_GetOut_English.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Thriller_GetOut_English.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Thriller_MeeryChristmas_Tamil.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Thriller_MeeryChristmas_Tamil.jpg" alt="Aavesham">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Thriller_Hit2_Telugu.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Thriller_Hit2_Telugu.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Thriller_Maharaja_Tamil.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Thriller_Maharaja_Tamil.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thumbnail" data-video="http://localhost:5000/uploads/videos/Thriller_Iratta_Malayalam.mp4">
+                        <img src="http://localhost:5000/uploads/thumbnails/Thriller_Iratta_Malayalam.jpg" alt="Movie Title">
+                        <div class="play-overlay">
+                            <button class="play-button-hover">Play</button>
+                        </div>
+                        <div class="heart-container" title="Like">
+                            <input type="checkbox" class="checkbox" id="heart-new-0">
+                            <div class="svg-container">
+                                <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                                </svg>
+                                <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                                </svg>
+                                <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="10,10 20,20"></polygon>
+                                    <polygon points="10,50 20,50"></polygon>
+                                    <polygon points="20,80 30,70"></polygon>
+                                    <polygon points="90,10 80,20"></polygon>
+                                    <polygon points="90,50 80,50"></polygon>
+                                    <polygon points="80,80 70,70"></polygon>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    </div>
+
+    <script>
+    // Handle play button clicks
+
+    // Handle play button clicks
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("play-button-hover")) {
+            const thumbnail = e.target.closest(".thumbnail");
+            if (thumbnail) {
+                const videoSrc = thumbnail.getAttribute("data-video");
+                if (videoSrc) {
+                    const fullScreenVideo = document.createElement("video");
+                    fullScreenVideo.src = videoSrc;
+                    fullScreenVideo.controls = true;
+                    fullScreenVideo.autoplay = true;
+                    fullScreenVideo.style.position = "fixed";
+                    fullScreenVideo.style.top = "0";
+                    fullScreenVideo.style.left = "0";
+                    fullScreenVideo.style.width = "100%";
+                    fullScreenVideo.style.height = "100%";
+                    fullScreenVideo.style.backgroundColor = "black";
+                    fullScreenVideo.style.zIndex = "9999";
+
+                    // Close the video when it ends or is clicked
+                    fullScreenVideo.addEventListener("ended", () => fullScreenVideo.remove());
+                    fullScreenVideo.addEventListener("click", () => fullScreenVideo.remove());
+
+                    // Append the video to the body
+                    document.body.appendChild(fullScreenVideo);
+                } else {
+                    console.error("No video source found!");
+                }
+            }
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const muteIcon = document.getElementById("muteIcon");
+        const carousel = document.getElementById("autoplayCarousel");
+        let isMuted = true;
+
+        // Function to update mute status of currently active video
+        function updateMuteStatus() {
+            const activeItem = carousel.querySelector(".carousel-item.active video");
+            if (activeItem) {
+                activeItem.muted = isMuted;
+            }
+        }
+
+        // Event listener for the mute/unmute button
+        muteIcon.addEventListener("click", () => {
+            isMuted = !isMuted;
+            updateMuteStatus();
+
+            // Update the mute icon
+            muteIcon.querySelector("img").src = isMuted
+                ? "https://img.icons8.com/ios-filled/50/ffffff/mute--v1.png"
+                : "https://img.icons8.com/ios-filled/50/ffffff/speaker.png";
+        });
+
+        // Event listener for carousel slide event to ensure mute state is maintained
+        carousel.addEventListener("slid.bs.carousel", () => {
+            updateMuteStatus();
+        });
+
+        // Initialize mute state for the first video
+        updateMuteStatus();
+    });
+
+    document.getElementById('profileButton').addEventListener('click', () => {
+    const sidebar = document.getElementById('userSidebar');
+    sidebar.classList.toggle('open');
+});
+
+// Fetch Username from Database and Display
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Replace with your actual endpoint
+        const response = await fetch('http://localhost:5000/api/getUser', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}` // Include token if required
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user: ${response.status}`);
+        }
+
+        const userData = await response.json();
+        const username = userData.username || 'User'; // Fallback to 'User' if username is not found
+        document.getElementById('usernameDisplay').textContent = `Hello, ${username}`;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Fallback to 'User' if there's an error
+        document.getElementById('usernameDisplay').textContent = 'Hello, User';
+    }
+});
+
+
+// Chatbot Button Click
+document.getElementById('chatbotButton').addEventListener('click', () => {
+    window.location.href = 'chatbot.html';
+});
+// Sign Out Button Click
+document.getElementById('signOutButton').addEventListener('click', () => {
+    // Clear token or session if needed
+    localStorage.removeItem('token'); // Adjust this based on how you manage authentication
+    window.location.href = 'sign-in.html'; // Redirect to sign-in page
+});
+
+
+</script>
+</body>
+</html>

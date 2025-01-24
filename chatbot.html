@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THEATRUM Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Body Styling */
+        body {
+            background: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Top Left Logo */
+        .top-left-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .top-left-logo img {
+            width: 150px;
+        }
+
+        /* Chat Container */
+        #chatContainer {
+            width: 400px;
+            height: 600px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.85);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Chat Header */
+        #chatHeader {
+            background: linear-gradient(90deg, #ff70a1, #00d9d9);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        /* Chat Messages */
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.3));
+        }
+
+        /* Input Container */
+        #chatInputContainer {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            background-color: #1e1e2f;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #chatInput {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #chatSendButton {
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #ff70a1, #00d9d9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+
+        #chatSendButton:hover {
+            background: linear-gradient(90deg, #e7638d, #00a3a3);
+            transform: scale(1.05);
+        }
+
+        /* Chat Bubbles */
+        .chat-bubble {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .chat-bubble.user {
+            background: linear-gradient(90deg, #ff70a1, #00d9d9);
+            color: white;
+            align-self: flex-end;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-bubble.bot {
+            background-color: #f0f0f0;
+            color: #333;
+            align-self: flex-start;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Chatbot Image */
+        .chatbot-image {
+            position: absolute;
+            bottom: 80px;
+            right: 350px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Left Logo -->
+    <div class="top-left-logo">
+        <img src="https://i.ibb.co/1QKq4w9/Screenshot-2024-11-23-153633-removebg-preview.png" alt="THEATRUM Logo">
+    </div>
+
+    <!-- Chat Container -->
+    <div id="chatContainer">
+        <div id="chatHeader">THEATRO -Virtual Assistant</div>
+        <div id="chatMessages"></div>
+        <div id="chatInputContainer">
+            <input type="text" id="chatInput" placeholder="Ask about THEATRUM..." />
+            <button id="chatSendButton">Send</button>
+        </div>
+    </div>
+
+    <!-- Chatbot Image -->
+    <img class="chatbot-image" src="https://i.ibb.co/qRFm0mh/chatbot-removebg-preview.png" alt="Chatbot Icon">
+
+    <script>
+        // FAQs Dataset for THEATRUM
+        const faqs = [
+            { question: "What is THEATRUM?", answer: "THEATRUM is your go-to OTT platform for a wide variety of movies and series across genres and languages." },
+            { question: "What are the subscription plans?", answer: "We offer Basic ,Premium and Standard plans" },
+            { question: "Can I watch content offline?", answer: "Yes, THEATRUM allows you to download content and watch offline." },
+            { question: "What languages are available?", answer: "Content is available in English, Hindi, Malayalam, Tamil, and Telugu." },
+            { question: "How do I filter movies?", answer: "You can filter movies by genre, language, or search for specific titles." },
+            { question: "How do I reset my password?", answer: "You can reset your password using the 'Forgot Password' option on the login page." },
+            { question: "How do I manage my subscription?", answer: "You can manage your subscription in the 'Account Settings' section." },
+            { question: "What devices are supported?", answer: "THEATRUM is supported on mobile, tablet, desktop, and smart TVs." },
+            { question: "Is there a free trial?", answer: "Yes, we offer a 7-day free trial for new users." },
+            { question: "How can I contact support?", answer: "You can contact us through the 'Help & Support' section in the app." },
+            { question: "Hello", answer: "Hi! How can I assist you with THEATRUM today?" },
+            { question: "Hi", answer: "Hello! What would you like to know about THEATRUM?" },
+            { question: "Can I share my account?", answer: "Yes, account sharing is possible based on your subscription plan." },
+            { question: "How do I change my profile settings?", answer: "You can change your profile settings in the 'Account' section of the app." }
+        ];
+
+        // Append Messages to Chat
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendButton = document.getElementById('chatSendButton');
+
+        function appendMessage(sender, message) {
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('chat-bubble', sender === 'user' ? 'user' : 'bot');
+            messageBubble.textContent = message;
+            chatMessages.appendChild(messageBubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to the bottom
+        }
+
+        // Handle User Query
+        function findAnswer(userMessage) {
+            const faqMatch = faqs.find(faq => userMessage.toLowerCase().includes(faq.question.toLowerCase()));
+            return faqMatch ? faqMatch.answer : "I'm sorry, I couldn't find an answer. Please contact support for assistance.";
+        }
+
+        // Handle Sending Messages
+        function sendMessage() {
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            // Append User Message
+            appendMessage('user', userMessage);
+            chatInput.value = '';
+
+            // Find and Append Bot Response
+            const botResponse = findAnswer(userMessage);
+            appendMessage('bot', botResponse);
+        }
+
+        // Send Message on Button Click or Enter Key
+        chatSendButton.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>

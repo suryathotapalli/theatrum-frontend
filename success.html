@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            text-align: center;
+            padding: 2em;
+            background-color: #f5f5f5;
+        }
+
+        .content {
+            max-width: 600px;
+            margin: 2em auto;
+            padding: 2em;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #28a745;
+            font-size: 2em;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 1em;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 1em;
+            padding: 0.75em 1.5em;
+            font-size: 1em;
+            color: white;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Payment Successful!</h1>
+        <p>Thank you for your subscription. We're excited to have you onboard!</p>
+        <a href="user-dashboard.html">Go to Dashboard</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupData = JSON.parse(localStorage.getItem('signupData'));
+            const selectedPlan = JSON.parse(localStorage.getItem('selectedPlan'));
+            const paymentMethod = localStorage.getItem('paymentMethod');
+
+            // Check if all required data exists
+            if (!signupData || !selectedPlan || !paymentMethod) {
+                alert('Welcome to Theatrum!');
+                window.location.href = 'sign-up.html';
+                return;
+            }
+
+            // Prepare user details for backend
+            const userDetails = {
+                name: signupData.username,
+                email: signupData.email,
+                password: signupData.password,
+                plan: selectedPlan.name, // Plan name must align with schema
+                paymentStatus: 'Paid',  // Matches the schema enum
+                paymentMethod: paymentMethod, // 'Card' or 'UPI'
+            };
+
+            console.log('Final User Details:', userDetails);
+
+            // Send user details to the backend
+            fetch('http://localhost:5000/api/auth/save-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userDetails),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to save user.');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log('User Saved Successfully:', data);
+                    alert('Your subscription has been activated! Redirecting to dashboard.');
+                    localStorage.clear(); // Clear all temporary data
+                    window.location.href = 'user-dashboard.html';
+                })
+                .catch((error) => {
+                    console.error('Error Saving User:', error);
+                    alert('An error occurred while saving your details. Please try again.');
+                });
+        });
+    </script>
+</body>
+</html>

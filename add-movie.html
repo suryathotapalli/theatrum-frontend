@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Movie</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: #f0f0f0;
+        }
+        .container {
+            margin: 2rem auto;
+            max-width: 400px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>Add Movie</h1>
+        <form id="addMovieForm">
+            <label for="title">Movie Title</label>
+            <input type="text" id="title" name="title" required>
+            <label for="genre">Genre</label>
+            <input type="text" id="genre" name="genre" required>
+            <label for="language">Language</label>
+            <input type="text" id="language" name="language" required>
+            <button type="submit" class="primary">Add Movie</button>
+        </form>
+    </main>
+    <script>
+        document.getElementById('addMovieForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const movie = {
+                title: document.getElementById('title').value,
+                genre: document.getElementById('genre').value,
+                language: document.getElementById('language').value,
+            };
+
+            fetch('http://localhost:5000/api/admin/movies', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(movie),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Movie added successfully!');
+                    location.href = 'movies-management.html';
+                })
+                .catch(error => console.error('Error adding movie:', error));
+        });
+    </script>
+</body>
+</html>

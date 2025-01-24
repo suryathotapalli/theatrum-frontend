@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>THEATRUM - Payment Method</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center top;
+            color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            padding: 2em;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 1em;
+        }
+
+        .payment-option {
+            display: block;
+            padding: 1em;
+            margin: 1em 0;
+            background-color: transparent;
+            color: white;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        .payment-option:hover {
+            background-color: white;
+            color: black;
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h2>Select Payment Method</h2>
+        <button class="payment-option" onclick="selectPaymentMethod('Card')">Pay with Card</button>
+        <button class="payment-option" onclick="selectPaymentMethod('UPI')">Pay with UPI</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Retrieve the selected plan and signup data from localStorage
+            const selectedPlan = JSON.parse(localStorage.getItem('selectedPlan'));
+            const signupData = JSON.parse(localStorage.getItem('signupData'));
+    
+            // Check if the selected plan and signup data exist in localStorage
+            if (!signupData) {
+                alert("Signup data is missing. Redirecting to sign-up page.");
+                window.location.href = "sign-up.html";
+                return;
+            }
+    
+            if (!selectedPlan) {
+                alert("Missing plan details. Redirecting to plan selection.");
+                window.location.href = "plan-selection.html";
+                return;
+            }
+    
+            // Debugging: Log the retrieved plan and signup data
+            console.log("Signup Data retrieved from localStorage:", signupData);
+            console.log("Plan retrieved from localStorage:", selectedPlan);
+    
+            // Set plan and price for payment methods
+            const plan = selectedPlan.name;
+            const price = selectedPlan.price;
+    
+            // Attach payment method selection event
+            window.selectPaymentMethod = (method) => {
+                // Store selected payment method in localStorage
+                localStorage.setItem('paymentMethod', method);
+    
+                // Debugging: Log the selected payment method
+                console.log("Payment Method selected:", method);
+    
+                // Redirect to the respective payment page with plan details
+                if (method === 'Card') {
+                    window.location.href = `payment.html?plan=${plan}&price=${price}&method=Card`;
+                } else if (method === 'UPI') {
+                    window.location.href = `upi-payment.html?plan=${plan}&price=${price}&method=UPI`;
+                }
+            };
+    
+            // Debugging: Attach click handlers dynamically
+            const cardButton = document.querySelector("#payWithCard");
+            const upiButton = document.querySelector("#payWithUPI");
+    
+            if (cardButton) {
+                cardButton.addEventListener("click", () => selectPaymentMethod("Card"));
+            }
+    
+            if (upiButton) {
+                upiButton.addEventListener("click", () => selectPaymentMethod("UPI"));
+            }
+        });
+    </script>
+    
+    
+</body>
+</html>

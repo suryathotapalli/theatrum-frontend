@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>THEATRUM - UPI Payment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center top;
+            color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            padding: 2em;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 1em;
+        }
+
+        .summary {
+            text-align: left;
+            color: #e0e0e0;
+            margin-bottom: 1.5em;
+        }
+
+        .plan-links {
+            text-align: left;
+            margin-bottom: 2em;
+        }
+
+        .plan-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .plan-links a:hover {
+            color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h2>Pay with UPI</h2>
+
+        <div class="plan-links">
+            <h3>Quick Links:</h3>
+            <ul>
+                <li><a href="https://rzp.io/rzp/nMghRgJ" target="_blank">Basic Plan</a></li>
+                <li><a href="https://rzp.io/rzp/YWDggXqR" target="_blank">Standard Plan</a></li>
+                <li><a href="https://rzp.io/rzp/ZTHpsMyc" target="_blank">Premium Plan</a></li>
+            </ul>
+        </div>
+
+        <div class="summary">
+            <p><strong>Selected Plan:</strong> <span id="selectedPlan">Loading...</span></p>
+            <p><strong>Price:</strong> ₹<span id="planPrice">Loading...</span>/month</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to parse URL parameters
+        function getUrlParams() {
+            const params = {};
+            window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (str, key, value) {
+                params[key] = decodeURIComponent(value);
+            });
+            return params;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const params = getUrlParams();
+
+            // Retrieve signupData and validate it
+            const signupData = JSON.parse(localStorage.getItem('signupData'));
+            if (!signupData) {
+                alert('Signup data is missing. Redirecting to sign-up page.');
+                window.location.href = 'sign-up.html';
+                return;
+            }
+
+            // Validate required parameters
+            if (!params.plan || !params.price) {
+                alert('Missing payment details. Redirecting to plan selection.');
+                window.location.href = 'plan-selection.html';
+                return;
+            }
+
+            // Display plan and price
+            document.getElementById("selectedPlan").textContent = params.plan;
+            document.getElementById("planPrice").textContent = params.price;
+
+            // Store selected plan in localStorage
+            localStorage.setItem('selectedPlan', JSON.stringify(params));
+        });
+    </script>
+</body>
+</html>

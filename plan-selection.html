@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>THEATRUM - Plan Selection</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+     body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center top;
+            color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            padding-top: 2em;
+        }
+
+        h2 {
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        .plan-card {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 1.5em;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .plan-card.selected {
+            background-color: #008080;
+            color: #ffffff;
+            transform: translateY(-12px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .plan-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+
+        .plan-feature {
+            margin: 0.3em 0;
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .price {
+            font-size: 1.25em;
+            color: #00bc8c;
+            font-weight: bold;
+            margin-top: 0.5em;
+        }
+
+        .plan-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5em;
+            margin-top: 1em;
+        }
+
+        .proceed-btn {
+            display: block;
+            width: 100%;
+            padding: 1em;
+            margin-top: 1.5em;
+            background-color: transparent;
+            color: white;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: not-allowed;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+            text-align: center;
+        }
+
+        .proceed-btn.active {
+            cursor: pointer;
+        }
+
+        .proceed-btn.active:hover {
+            background-color: white;
+            color: black;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        footer {
+            padding: 1em;
+            text-align: center;
+            color: #bdbdbd;
+            margin-top: 2em;
+        }
+
+        footer a {
+            color: #00bcd4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #ffffff;
+        } 
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <main class="container content">
+        <h2>Choose the Plan That's Right for You</h2>
+        <div class="plan-cards">
+            <div class="plan-card" onclick="selectPlan('Basic', 199)">
+                <h3 class="plan-title">Basic</h3>
+                <p class="plan-feature">Resolution: 720p (HD)</p>
+                <p class="plan-feature">Video and sound quality: Good</p>
+                <p class="price">₹199/month</p>
+            </div>
+
+            <div class="plan-card" onclick="selectPlan('Standard', 499)">
+                <h3 class="plan-title">Standard</h3>
+                <p class="plan-feature">Resolution: 1080p (Full HD)</p>
+                <p class="plan-feature">Video and sound quality: Great</p>
+                <p class="price">₹499/month</p>
+            </div>
+
+            <div class="plan-card" onclick="selectPlan('Premium', 649)">
+                <h3 class="plan-title">Premium</h3>
+                <p class="plan-feature">Resolution: 4K (Ultra HD) + HDR</p>
+                <p class="plan-feature">Video and sound quality: Best</p>
+                <p class="price">₹649/month</p>
+            </div>
+        </div>
+        <button type="button" class="proceed-btn" id="proceedButton" onclick="goToPayment()">Proceed to Payment</button>
+    </main>
+
+    <footer>
+        <small><a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a></small>
+    </footer>
+
+    <script>
+        let selectedPlan = { name: '', price: 0 };
+    
+        function selectPlan(name, price) {
+            selectedPlan = { name, price };
+    
+            // Highlight the selected plan
+            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+    
+            // Enable the Proceed button
+            const proceedButton = document.getElementById('proceedButton');
+            proceedButton.classList.add('active');
+            proceedButton.disabled = false;
+    
+            // Debug log for plan selection
+            console.log('Plan selected:', selectedPlan);
+        }
+    
+        function goToPayment() {
+            if (!selectedPlan.name) {
+                alert('Please select a plan before proceeding.');
+                return;
+            }
+    
+            // Store selected plan in localStorage
+            localStorage.setItem('selectedPlan', JSON.stringify(selectedPlan));
+    
+            // Debug log for plan storage
+            console.log('Stored selectedPlan in localStorage:', localStorage.getItem('selectedPlan'));
+    
+            // Redirect to payment method page
+            window.location.href = 'payment-method.html';
+        }
+    
+        // On page load, check and validate data
+        document.addEventListener("DOMContentLoaded", function () {
+            const proceedButton = document.getElementById('proceedButton');
+            proceedButton.disabled = true;
+    
+            // Debug log to check if a plan was already stored in localStorage
+            const storedPlan = localStorage.getItem('selectedPlan');
+            console.log('Initial selectedPlan in localStorage:', storedPlan);
+    
+            if (storedPlan) {
+                try {
+                    const parsedPlan = JSON.parse(storedPlan);
+                    console.log('Parsed plan from localStorage:', parsedPlan);
+                } catch (error) {
+                    console.error('Error parsing stored plan from localStorage:', error);
+                }
+            }
+    
+            // Check for signupData in localStorage
+            const signupData = localStorage.getItem('signupData');
+            if (!signupData) {
+                alert('Signup data missing. Redirecting to sign-up page.');
+                window.location.href = 'sign-up.html';
+            } else {
+                try {
+                    const parsedSignupData = JSON.parse(signupData);
+                    console.log('Signup Data in Plan Selection Page:', parsedSignupData);
+    
+                    // Debugging log to confirm signup data retrieval
+                    if (parsedSignupData.username && parsedSignupData.email) {
+                        console.log('Signup Data is valid.');
+                    } else {
+                        throw new Error('Invalid signup data structure.');
+                    }
+                } catch (error) {
+                    console.error('Error parsing signup data from localStorage:', error);
+                    alert('Invalid signup data. Redirecting to sign-up page.');
+                    window.location.href = 'sign-up.html';
+                }
+            }
+        });
+    </script>
+    
+    
+    
+    
+</body>
+</html>

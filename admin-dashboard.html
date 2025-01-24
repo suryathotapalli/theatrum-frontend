@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THEATRUM - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+    background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh; /* Ensure the background covers the viewport */
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-top: 2em;
+        }
+
+        header h1 {
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            font-size: 2.5em;
+        }
+
+        main {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 2em;
+            gap: 1.5em;
+            margin-bottom: auto; /* Ensure the cards are pushed closer to the top */
+            margin-top: -5em;
+        }
+
+        .action-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            padding: 1.5em;
+            width: 250px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 128, 128, 0.9);
+            color: white;
+        }
+
+        .action-card img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1em;
+        }
+
+        footer {
+    text-align: center;
+    padding: 1em;
+    color: #bdbdbd;
+    margin-top: auto; /* Push footer to the bottom */
+}
+
+        footer a {
+            color: #00bcd4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <header>
+        <div style="position: absolute; top: 5px; left: 5px;width: 150px;">
+            <img src="https://i.ibb.co/1QKq4w9/Screenshot-2024-11-23-153633-removebg-preview.png" alt="Theatrum Logo" style="width: 150px;">
+        </div>
+        <h1>Admin Dashboard</h1>
+    </header>
+
+    <main>
+        <!-- Movies Management -->
+        <div class="action-card" onclick="location.href='movies-management.html'">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/movie.png" alt="Manage Movies Icon">
+            <h3>Manage Movies</h3>
+            <p>Add, update, or delete movies in the catalog.</p>
+        </div>
+
+        <!-- User Management -->
+        <div class="action-card" onclick="location.href='user-management.html'">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Manage Users Icon">
+            <h3>Manage Users</h3>
+            <p>View and manage user accounts and plans.</p>
+        </div>
+
+    </main>
+
+    <footer>
+        <small>&copy; 2024 THEATRUM. All rights reserved. | <a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a></small>
+    </footer>
+</body>
+</html>

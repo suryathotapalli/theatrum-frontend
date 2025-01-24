@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THEATRUM - Add User</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center top;
+            color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            padding: 2em;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h2 {
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 1em;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #ffffff;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75em;
+            margin-bottom: 0.5em;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        input:focus {
+            outline: none;
+            border: 1px solid teal;
+        }
+
+        button {
+            width: 100%;
+            padding: 1em;
+            margin-top: 1em;
+            background-color: #008080;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #005f5f;
+            transform: translateY(-3px);
+        }
+
+        .success-message {
+            margin-top: 1em;
+            color: lightgreen;
+        }
+
+        .error-message {
+            margin-top: 1em;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h2>Add User</h2>
+        <form id="addUserForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter user's name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter user's email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="form-group">
+                <label for="plan">Plan</label>
+                <input type="text" id="plan" name="plan" placeholder="Enter user's plan (e.g., Basic, Standard, Premium)" required>
+            </div>
+            <button type="submit">Add User</button>
+        </form>
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form data
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const plan = document.getElementById('plan').value;
+
+            // Prepare the user data
+            const userData = {
+                name: username,
+                email,
+                password,
+                plan: {
+                    name: plan,
+                    startDate: new Date(),
+                    endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)), // Valid for 1 month
+                },
+            };
+
+            try {
+                // Send data to the backend
+                const response = await fetch('http://localhost:5000/api/admin/add-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('successMessage').textContent = result.message;
+                    document.getElementById('errorMessage').textContent = '';
+                    e.target.reset(); // Clear the form
+                } else {
+                    document.getElementById('successMessage').textContent = '';
+                    document.getElementById('errorMessage').textContent = result.message || 'Error adding user';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('successMessage').textContent = '';
+                document.getElementById('errorMessage').textContent = 'An error occurred while adding the user.';
+            }
+        });
+    </script>
+</body>
+</html>

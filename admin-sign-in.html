@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THEATRUM - Admin Sign In</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            background-image: url('https://i.ibb.co/K7hm3HS/DALL-E-2024-11-13-16-31-04-A-cinematic-background-with-subtle-hints-of-a-theater-ambiance-Include-ab.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center top;
+            color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            max-width: 400px;
+            padding: 2em;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            margin-bottom: 1em;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75em;
+            margin: 0.5em 0;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 5px;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .sign-in-btn {
+            display: block;
+            width: 100%;
+            padding: 1em;
+            margin-top: 1em;
+            background-color: transparent;
+            color: white;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        .sign-in-btn:hover {
+            background-color: white;
+            color: black;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h2>Admin Sign In</h2>
+        <form id="adminSignInForm">
+            <input type="text" id="adminUsername" class="input-field" placeholder="Username" required>
+            <input type="password" id="adminPassword" class="input-field" placeholder="Password" required>
+            <button type="submit" class="sign-in-btn">Sign In</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("adminSignInForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById("adminUsername").value;
+            const password = document.getElementById("adminPassword").value;
+
+            // Simulate backend validation
+            if (username === "admin" && password === "password123") {
+                alert("Sign In Successful!");
+                window.location.href = "admin-dashboard.html";
+            } else {
+                alert("Invalid credentials. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>
